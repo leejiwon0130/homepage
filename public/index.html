@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엘제이뷰 LJ VIEW — 시선을 디자인하다</title>
+<meta name="description" content="기획과 디자인, 그리고 전략이 만나는 브랜드 마케팅 하우스. 10년차 현업 마케터의 AI 마케팅 강의·홍보대행·디자인.">
+
+<!-- 폰트: CDN 로드 (워드프레스에서도 그대로 작동) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  @font-face { font-family:'Gmarket Sans'; font-weight:700; font-style:normal; font-display:swap;
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff'); }
+  @font-face { font-family:'Gmarket Sans'; font-weight:500; font-style:normal; font-display:swap;
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff'); }
+  @font-face { font-family:'Gmarket Sans'; font-weight:300; font-style:normal; font-display:swap;
+    src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansLight.woff') format('woff'); }
+
+  :root {
+    --brand: #43a49d;
+    --brand-dark: #38827b;
+    --brand-deep: #1a3a35;
+    --brand-tint: #7ad3cb;
+    --ink: #141924;
+    --paper: #F7F4EE;
+    --cream: #fef9f0;
+    --charcoal: #333333;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; font-family:'Pretendard Variable','Pretendard','Noto Sans KR',sans-serif; color:var(--ink); background:var(--paper); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  a { color:inherit; text-decoration:none; }
+  img { max-width:100%; }
+  ::selection { background:var(--brand); color:#fff; }
+
+  .gm { font-family:'Gmarket Sans',sans-serif; }
+  .container { max-width:1280px; margin:0 auto; padding:0 clamp(28px,6vw,120px); }
+  .container-narrow { max-width:1180px; margin:0 auto; padding:0 clamp(28px,6vw,120px); }
+
+  /* 섹션 공통 라벨 (─ LABEL) */
+  .sec-label { display:inline-flex; align-items:center; gap:10px; margin-bottom:24px; }
+  .sec-label .bar { width:30px; height:1.5px; background:var(--brand); display:inline-block; }
+  .sec-label .txt { font-size:13px; font-weight:600; letter-spacing:0.22em; color:var(--brand); text-transform:uppercase; }
+  .sec-label.on-dark .txt { color:var(--brand-tint); }
+
+  @keyframes ljScrollDot { 0%{transform:translateY(0);opacity:0;} 30%{opacity:1;} 60%{opacity:1;} 100%{transform:translateY(14px);opacity:0;} }
+  @keyframes ljMarquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  @keyframes ljZoom { from{transform:scale(1.12);} to{transform:scale(1);} }
+
+  /* [data-reveal] 스크롤 등장 애니메이션 — JS가 제어 */
+  [data-reveal] { opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
+  [data-reveal].shown { opacity:1; transform:none; }
+
+  /* ============ HEADER ============ */
+  .site-header { position:fixed; top:0; left:0; right:0; z-index:50; transition:background .35s, box-shadow .35s, border-color .35s; border-bottom:1px solid transparent; background:transparent; }
+  .site-header.scrolled { background:rgba(247,244,238,0.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 1px 0 rgba(20,25,36,0.05); border-color:rgba(20,25,36,0.06); }
+  .header-inner { max-width:1280px; margin:0 auto; padding:0 clamp(28px,6vw,120px); height:78px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .header-logo img { height:30px; width:auto; display:block; }
+  .main-nav { display:flex; align-items:center; gap:40px; }
+  .main-nav a { font-size:15px; font-weight:500; letter-spacing:0.01em; padding:6px 0; color:var(--ink); transition:color .25s; }
+  .main-nav a:hover { color:var(--brand) !important; }
+  .kakao-pill { display:inline-flex; align-items:center; gap:8px; white-space:nowrap; background:var(--brand); color:#fff; font-size:14px; font-weight:600; padding:11px 20px; border-radius:999px; box-shadow:0 6px 18px rgba(67,164,157,0.28); transition:background .25s; }
+  .kakao-pill:hover { background:var(--brand-dark); }
+  .kakao-pill .dot { width:7px; height:7px; border-radius:50%; background:#fff; display:inline-block; }
+
+  /* ============ HERO ============ */
+  .hero { position:relative; min-height:100vh; overflow:hidden; background:var(--paper); }
+  /* 히어로 사진: 이 img의 src만 교체하면 됩니다 (assets/hero.png). 밝은 이미지 기준 오버레이/텍스트 색 — 어두운 사진으로 바꾸면 오버레이·텍스트 색도 같이 되돌려야 함 */
+  .hero-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; animation:ljZoom 8s ease-out both; }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(105deg,rgba(247,244,238,0.82) 0%,rgba(247,244,238,0.45) 45%,rgba(247,244,238,0) 78%); pointer-events:none; }
+  .hero-inner { position:relative; z-index:2; max-width:1280px; margin:0 auto; padding:0 clamp(28px,6vw,120px); min-height:100vh; display:flex; flex-direction:column; justify-content:center; }
+  .hero-copy { max-width:680px; }
+  .hero-eyebrow { display:inline-flex; align-items:center; gap:12px; margin-bottom:32px; }
+  .hero-eyebrow .bar { width:34px; height:1.5px; background:var(--brand); display:inline-block; }
+  .hero-eyebrow .txt { font-size:14px; font-weight:600; letter-spacing:0.24em; color:var(--brand-dark); text-transform:uppercase; }
+  .hero h1 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(52px,6.8vw,104px); line-height:1.04; letter-spacing:-0.03em; margin:0 0 30px; color:var(--brand-deep); }
+  .hero h1 .accent { color:var(--brand); }
+  .hero-sub { font-size:clamp(19px,1.7vw,25px); line-height:1.6; color:#3a4a47; margin:0 0 46px; max-width:520px; word-break:keep-all; }
+  .hero-sub strong { font-weight:700; color:var(--brand-deep); }
+  .hero-ctas { display:flex; flex-wrap:wrap; gap:14px; }
+  .btn-primary { display:inline-flex; align-items:center; gap:10px; background:var(--brand); color:#fff; font-size:16px; font-weight:600; padding:17px 32px; border-radius:999px; box-shadow:0 14px 34px -12px rgba(67,164,157,0.6); transition:background .25s; }
+  .btn-primary:hover { background:var(--brand-dark); }
+  .btn-ghost { display:inline-flex; align-items:center; gap:9px; background:rgba(20,25,36,0.04); color:var(--ink); font-size:16px; font-weight:600; padding:17px 30px; border-radius:999px; border:1.5px solid rgba(20,25,36,0.22); backdrop-filter:blur(6px); transition:border-color .25s, background .25s; }
+  .btn-ghost:hover { border-color:var(--ink); background:rgba(20,25,36,0.08); }
+  .hero-scroll { position:absolute; left:50%; bottom:38px; z-index:2; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:10px; color:rgba(20,25,36,0.4); }
+  .hero-scroll .mouse { width:22px; height:34px; border:1.5px solid rgba(20,25,36,0.3); border-radius:12px; position:relative; display:inline-block; }
+  .hero-scroll .mouse span { position:absolute; left:50%; top:7px; transform:translateX(-50%); width:3px; height:6px; border-radius:2px; background:var(--brand); animation:ljScrollDot 1.8s ease-in-out infinite; }
+  .hero-scroll .label { font-size:12px; letter-spacing:0.18em; text-transform:uppercase; }
+
+  /* ============ ABOUT ============ */
+  .about { background:var(--cream); padding:clamp(86px,10vw,150px) 0; position:relative; overflow:hidden; }
+  .about-watermark { position:absolute; top:64px; right:-1.5%; font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(120px,17vw,250px); line-height:0.8; color:rgba(26,58,53,0.05); letter-spacing:-0.04em; pointer-events:none; user-select:none; z-index:0; }
+  .about-inner { position:relative; z-index:1; }
+  /* 좌우 균형: 섹션 헤더를 중앙 정렬로 (기존 왼쪽 치우침 수정) */
+  .about-head { text-align:center; max-width:760px; margin:0 auto clamp(48px,6vw,78px); }
+  .about-head .sec-label { justify-content:center; }
+  .about-head h2 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(40px,5.3vw,76px); line-height:1.08; letter-spacing:-0.03em; margin:0 0 26px; color:var(--brand-deep); }
+  .about-head h2 .accent { color:var(--brand); }
+  .about-head p { font-size:clamp(18px,1.55vw,23px); line-height:1.7; color:#3a4a47; margin:0; word-break:keep-all; }
+
+  .about-grid { display:grid; grid-template-columns:0.85fr 1.15fr; gap:clamp(40px,6vw,84px); align-items:center; }
+  /* 배경 박스 없이 누끼 PNG를 크림 배경 위에 직접 얹고, 뒤에 은은한 워드마크로 정체성 강조 */
+  .founder-photo-frame { position:relative; width:100%; min-height:clamp(320px,36vw,460px); display:flex; align-items:flex-end; justify-content:center; }
+  .founder-photo-word { position:absolute; left:50%; top:44%; transform:translate(-50%,-50%); font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(44px,5.6vw,78px); line-height:0.92; letter-spacing:-0.02em; color:rgba(67,164,157,0.14); text-align:center; white-space:nowrap; pointer-events:none; user-select:none; z-index:0; }
+  .founder-photo-frame img { position:relative; z-index:1; width:auto; max-width:100%; max-height:clamp(340px,38vw,480px); display:block; filter:drop-shadow(0 22px 34px rgba(26,58,53,0.16)); }
+  .founder-photo-placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#9ab5b0; font-size:14px; font-weight:600; }
+  .founder-head { padding-bottom:22px; margin-bottom:24px; border-bottom:1px solid rgba(26,58,53,0.14); }
+  .founder-head .eyebrow { font-size:15px; font-weight:600; letter-spacing:0.18em; color:var(--brand); text-transform:uppercase; }
+  .founder-head h3 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(30px,2.6vw,38px); line-height:1.15; letter-spacing:-0.01em; margin:11px 0 8px; color:var(--brand-deep); }
+  .founder-head h3 .suffix { font-size:0.6em; font-weight:500; }
+  .founder-head .role { font-size:17px; color:#5a6864; margin:0 0 14px; }
+  /* 역할 태그: 강의·홍보대행·디자인 — "다 직접 하는 현업 마케터" 강조 */
+  .founder-tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .founder-tags span { font-size:13px; font-weight:600; color:var(--brand-dark); background:rgba(67,164,157,0.12); padding:6px 14px; border-radius:999px; }
+  .founder-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:13px; }
+  .founder-list li { display:flex; align-items:flex-start; gap:13px; font-size:clamp(16px,1.2vw,18px); line-height:1.55; color:#3a4a47; word-break:keep-all; }
+  .founder-list li.lead { color:var(--brand-deep); font-weight:600; }
+  .founder-list .bullet { flex:none; width:7px; height:7px; border-radius:50%; background:rgba(67,164,157,0.45); margin-top:9px; }
+  .founder-list li.lead .bullet { background:var(--brand); }
+
+  .stats { margin-top:clamp(60px,7vw,92px); background:var(--brand-deep); border-radius:24px; padding:clamp(40px,4.6vw,60px) clamp(26px,4vw,56px); display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(26px,4vw,40px); }
+  .stat { text-align:center; }
+  .stat .num { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(38px,4.4vw,56px); line-height:1; color:#fff; letter-spacing:-0.02em; }
+  .stat .num .suffix { font-size:0.42em; font-weight:700; margin-left:3px; color:var(--brand); }
+  .stat .label { margin:15px 0 0; font-size:clamp(13px,1.1vw,15px); font-weight:600; color:#8fd3cb; }
+
+  /* ============ CLIENTS 마퀴 (함께한 기관) ============ */
+  .clients { background:var(--cream); padding:0 0 clamp(70px,8vw,110px); overflow:hidden; }
+  .clients-title { text-align:center; font-size:13px; font-weight:600; letter-spacing:0.2em; color:#a39d90; text-transform:uppercase; margin:0 0 28px; }
+  .clients-track-wrap { position:relative; overflow:hidden; }
+  .clients-track { display:flex; align-items:center; gap:clamp(40px,5vw,72px); width:max-content; animation:ljMarquee 36s linear infinite; }
+  .clients-track:hover { animation-play-state:paused; }
+  .clients-track span { font-family:'Gmarket Sans',sans-serif; font-weight:500; font-size:clamp(16px,1.5vw,20px); color:#b8b0a0; white-space:nowrap; }
+  .clients-fade-l, .clients-fade-r { position:absolute; top:0; bottom:0; width:clamp(40px,8vw,140px); pointer-events:none; z-index:2; }
+  .clients-fade-l { left:0; background:linear-gradient(90deg,var(--cream),rgba(254,249,240,0)); }
+  .clients-fade-r { right:0; background:linear-gradient(270deg,var(--cream),rgba(254,249,240,0)); }
+
+  /* ============ SERVICES ============ */
+  .services { background:var(--charcoal); padding:140px 0; }
+  .services-head { max-width:720px; margin:0 auto 60px; text-align:center; }
+  .services-head h2 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(30px,3.6vw,50px); line-height:1.22; letter-spacing:-0.02em; margin:0 0 18px; color:#fff; word-break:keep-all; }
+  .services-head p { font-size:18px; line-height:1.8; color:rgba(255,255,255,0.72); margin:0; word-break:keep-all; }
+  .services-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+  .svc-card { display:flex; flex-direction:column; padding:40px 30px 34px; border-radius:18px; background:#fff; border:1px solid #fff; color:var(--brand); transition:transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s, border-color .5s, color .5s; }
+  .svc-card:hover { transform:translateY(-8px); box-shadow:0 30px 60px -26px rgba(0,0,0,0.5); border-color:var(--brand); color:#2f8a83; }
+  .svc-card svg { margin-bottom:26px; }
+  .svc-card .en { font-size:12px; font-weight:600; letter-spacing:0.08em; color:#a39d90; margin-bottom:14px; display:block; }
+  .svc-card h3 { font-family:'Gmarket Sans',sans-serif; font-weight:500; font-size:21px; letter-spacing:-0.01em; margin:0 0 10px; color:var(--charcoal); }
+  .svc-card p { font-size:14.5px; line-height:1.65; color:#5a5f69; margin:0 0 24px; word-break:keep-all; }
+  .svc-card .more { margin-top:auto; display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:600; }
+
+  /* ============ REVIEWS (마소니: 가로 동일·세로 자유) ============ */
+  .reviews { background:#fff; padding:130px 0 140px; }
+  .reviews-head { text-align:center; max-width:720px; margin:0 auto 48px; }
+  .reviews-head .sec-label { justify-content:center; }
+  .reviews-head .sec-label .bar2 { width:30px; height:1.5px; background:var(--brand); display:inline-block; }
+  .reviews-head h2 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(30px,3.4vw,48px); line-height:1.2; letter-spacing:-0.02em; margin:0 0 16px; color:var(--charcoal); word-break:keep-all; }
+  .reviews-head p { font-size:17px; line-height:1.7; color:#8a8478; margin:0; word-break:keep-all; }
+  .review-tabs { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:44px; }
+  .review-tab { cursor:pointer; border:1.5px solid #e2ddd2; font-size:15px; font-weight:600; padding:11px 22px; border-radius:999px; transition:all .25s; font-family:inherit; white-space:nowrap; background:#fff; color:#5a5f69; }
+  .review-tab.active { background:var(--brand); border-color:var(--brand); color:#fff; box-shadow:0 10px 24px -12px rgba(67,164,157,0.7); }
+
+  /* CSS columns 마소니 — 카드 가로폭은 컬럼이 통일해주고, 세로는 내용만큼 자연스럽게 */
+  .review-masonry { columns:3 300px; column-gap:22px; }
+  .review-card { break-inside:avoid; margin:0 0 22px; background:#fff; border:1px solid #ece6d8; border-radius:20px; padding:30px 28px 26px; box-shadow:0 10px 30px -24px rgba(20,25,36,0.18); transition:transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s, border-color .45s; }
+  .review-card:hover { transform:translateY(-6px); box-shadow:0 26px 50px -26px rgba(20,25,36,0.28); border-color:rgba(67,164,157,0.4); }
+  .review-card .tag { display:inline-flex; align-items:center; font-size:11px; font-weight:700; letter-spacing:0.03em; color:var(--brand-dark); background:rgba(67,164,157,0.12); padding:5px 12px; border-radius:999px; margin-bottom:18px; }
+  .review-card p { font-size:15.5px; line-height:1.75; color:var(--charcoal); margin:0 0 24px; word-break:keep-all; }
+  .review-card .meta { display:flex; align-items:center; gap:10px; padding-top:18px; border-top:1px solid #f0ece0; }
+  .review-card .avatar { flex:none; width:30px; height:30px; border-radius:50%; background:rgba(67,164,157,0.14); color:var(--brand-dark); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; font-family:'Gmarket Sans',sans-serif; }
+  .review-card .org { font-size:13.5px; font-weight:600; color:var(--charcoal); }
+  /* 사진 후기 카드: 강의 현장·작업물 사진 (Notion/미디어 라이브러리에서 그때그때 추가) */
+  .review-card.photo { padding:0; overflow:hidden; }
+  .review-card.photo img { width:100%; display:block; }
+  .review-card.photo .photo-body { padding:20px 24px 24px; }
+  .review-card.photo .tag { margin-bottom:10px; }
+  .review-card.photo .photo-caption { font-size:14px; line-height:1.6; color:#5a5f69; margin:0; word-break:keep-all; }
+  .review-photo-placeholder { width:100%; background:linear-gradient(150deg, rgba(67,164,157,0.16), rgba(67,164,157,0.05)); display:flex; align-items:center; justify-content:center; color:rgba(67,164,157,0.55); }
+  .review-card[hidden] { display:none; }
+
+  /* ============ BLOG ============ */
+  .blog { background:var(--cream); padding:130px 0; }
+  .blog-head { display:flex; align-items:flex-end; justify-content:space-between; gap:30px; flex-wrap:wrap; margin-bottom:54px; }
+  .blog-head h2 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(28px,3.2vw,46px); line-height:1.2; letter-spacing:-0.02em; margin:0; color:var(--charcoal); word-break:keep-all; }
+  .blog-all { display:inline-flex; align-items:center; gap:9px; font-size:15px; font-weight:600; color:var(--ink); padding-bottom:6px; border-bottom:1.5px solid var(--ink); transition:color .25s, border-color .25s; }
+  .blog-all:hover { color:var(--brand); border-color:var(--brand); }
+  .blog-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+  .post-card { display:block; }
+  .post-thumb { position:relative; width:100%; aspect-ratio:4/3; margin-bottom:20px; border-radius:8px; overflow:hidden; background:linear-gradient(150deg, rgba(67,164,157,0.14), rgba(67,164,157,0.05)); }
+  .post-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.16,1,.3,1); }
+  .post-card:hover .post-thumb img { transform:scale(1.05); }
+  .post-cat { font-size:13px; font-weight:600; letter-spacing:0.08em; color:var(--brand); }
+  .post-title { font-size:19px; font-weight:600; line-height:1.45; margin:10px 0 0; color:var(--charcoal); word-break:keep-all; transition:color .25s; }
+  .post-card:hover .post-title { color:var(--brand); }
+
+  /* ============ CONTACT ============ */
+  .contact { background:#fff; padding:130px 0; }
+  .contact-grid { max-width:1080px; margin:0 auto; padding:0 clamp(28px,6vw,120px); display:grid; grid-template-columns:0.85fr 1.15fr; gap:64px; align-items:start; }
+  .contact-copy .eyebrow { font-size:14px; font-weight:600; letter-spacing:0.2em; color:var(--brand); text-transform:uppercase; margin:0 0 22px; }
+  .contact-copy h2 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(30px,3.4vw,46px); line-height:1.22; letter-spacing:-0.02em; margin:0 0 22px; color:var(--charcoal); word-break:keep-all; }
+  .contact-copy p { font-size:17px; line-height:1.75; color:#5a5f69; margin:0 0 32px; word-break:keep-all; }
+  .kakao-big { display:inline-flex; align-items:center; gap:9px; background:#fee500; color:#3c1e1e; font-size:15px; font-weight:700; padding:14px 24px; border-radius:12px; transition:transform .25s; }
+  .kakao-big:hover { transform:translateY(-2px); }
+  .contact-form-card { background:#fafaf7; border:1px solid #eceae3; border-radius:20px; padding:40px; box-shadow:0 24px 60px -36px rgba(20,25,36,0.3); }
+  .contact-form { display:flex; flex-direction:column; gap:20px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .contact-form label { display:flex; flex-direction:column; gap:9px; }
+  .contact-form label > span { font-size:14px; font-weight:600; color:var(--charcoal); }
+  .contact-form input, .contact-form select, .contact-form textarea { font-family:inherit; font-size:15px; color:var(--charcoal); padding:14px 16px; border:1.5px solid #e2ddd2; border-radius:10px; background:#fff; outline:none; transition:border-color .2s; }
+  .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color:var(--brand); }
+  .contact-form select { appearance:none; background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="%23999" stroke-width="2"><path d="M3 5l4 4 4-4"/></svg>'); background-repeat:no-repeat; background-position:right 16px center; }
+  .contact-form textarea { resize:vertical; min-height:120px; }
+  .contact-form button[type=submit] { margin-top:4px; cursor:pointer; border:none; font-family:inherit; background:var(--brand); color:#fff; font-size:16px; font-weight:600; padding:17px; border-radius:12px; box-shadow:0 14px 30px -14px rgba(67,164,157,0.6); transition:background .25s; }
+  .contact-form button[type=submit]:hover { background:var(--brand-dark); }
+  .form-note { margin:0; font-size:12.5px; color:#a39d90; text-align:center; }
+  .form-done { text-align:center; padding:48px 12px; }
+  .form-done .check { width:64px; height:64px; border-radius:50%; background:var(--brand); display:flex; align-items:center; justify-content:center; margin:0 auto 22px; color:#fff; font-size:30px; }
+  .form-done h3 { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:24px; margin:0 0 10px; color:var(--charcoal); }
+  .form-done p { font-size:16px; color:#5a5f69; margin:0; }
+
+  /* ============ FOOTER ============ */
+  .site-footer { background:var(--ink); color:#fff; padding:80px 0 40px; }
+  .footer-top { display:flex; justify-content:space-between; gap:40px; flex-wrap:wrap; padding-bottom:50px; border-bottom:1px solid rgba(255,255,255,0.1); }
+  .footer-brand { max-width:340px; }
+  .footer-brand img { height:30px; width:auto; display:block; margin-bottom:22px; }
+  .footer-brand p { font-size:15px; line-height:1.7; color:rgba(255,255,255,0.55); margin:0; word-break:keep-all; }
+  .footer-cols { display:flex; gap:64px; flex-wrap:wrap; }
+  .footer-col .col-title { font-size:12px; font-weight:600; letter-spacing:0.16em; color:rgba(255,255,255,0.4); text-transform:uppercase; margin:0 0 18px; }
+  .footer-col ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .footer-col ul a { font-size:15px; color:rgba(255,255,255,0.75); transition:color .25s; }
+  .footer-col ul a:hover { color:var(--brand-tint); }
+  .footer-kakao { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.08); color:#fff; font-size:14px; font-weight:600; padding:11px 18px; border-radius:999px; transition:background .25s; }
+  .footer-kakao:hover { background:var(--brand); }
+  .footer-bottom { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; padding-top:28px; }
+  .footer-bottom p { font-size:13px; color:rgba(255,255,255,0.4); margin:0; }
+
+  /* ============ 반응형 ============ */
+  @media (max-width:880px) {
+    .main-nav { display:none; }
+    .about-grid, .contact-grid { grid-template-columns:1fr; gap:32px; }
+    .services-grid { grid-template-columns:repeat(2,1fr); }
+    .stats { grid-template-columns:repeat(2,1fr); gap:40px 24px; }
+    .blog-grid { grid-template-columns:1fr; }
+    .review-masonry { columns:2 260px; }
+    .about, .services, .reviews, .blog, .contact { padding-top:78px; padding-bottom:78px; }
+  }
+  @media (max-width:560px) {
+    .form-row { grid-template-columns:1fr; }
+    .review-masonry { columns:2 140px; column-gap:14px; }
+    .review-card { padding:20px 16px 18px; border-radius:16px; }
+    .review-card .tag { font-size:10px; padding:4px 10px; margin-bottom:12px; }
+    .review-card p { font-size:13px; line-height:1.6; margin-bottom:16px; }
+    .review-card .meta { padding-top:14px; gap:8px; }
+    .review-card .avatar { width:24px; height:24px; font-size:11px; }
+    .review-card .org { font-size:12px; }
+    .review-card.photo .photo-body { padding:14px 14px 16px; }
+    .review-card.photo .photo-caption { font-size:12px; }
+  }
+  @media (max-width:430px) {
+    .stats { gap:34px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="#top" class="header-logo">
+      <!-- 스크롤 시 JS가 라이트/다크 로고 자동 교체 -->
+      <img id="headerLogo" src="assets/lj-view-logo.png" alt="LJ VIEW">
+    </a>
+    <nav class="main-nav">
+      <a href="#top">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div>
+      <a class="kakao-pill" href="https://open.kakao.com/o/sMNS6hQh" target="_blank" rel="noopener"><span class="dot"></span>카카오톡 문의</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <!-- 히어로 사진 교체: 아래 src만 바꾸면 됩니다. 추천 - 실제 강의 현장 사진 (가로 원본, 어두운 오버레이가 자동 적용됨) -->
+  <img class="hero-bg" src="assets/hero.png" alt="">
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-eyebrow" data-reveal>
+        <span class="bar"></span>
+        <span class="txt">Brand Marketing House</span>
+      </div>
+      <h1 data-reveal>시선을<br><span class="accent">디자인</span>하다</h1>
+      <p class="hero-sub" data-reveal>기획과 디자인, 그리고 전략이 만나는<br><strong>브랜드 마케팅 하우스</strong></p>
+      <div class="hero-ctas" data-reveal>
+        <a class="btn-primary" href="#services">서비스 보기 <span>→</span></a>
+        <a class="btn-ghost" href="https://open.kakao.com/o/sMNS6hQh" target="_blank" rel="noopener">카카오톡 문의</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <span class="mouse"><span></span></span>
+    <span class="label">Scroll</span>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="about" id="about">
+  <span class="about-watermark" aria-hidden="true">VIEW</span>
+  <div class="container-narrow about-inner">
+
+    <!-- 중앙 정렬 헤더 (왼쪽 치우침 수정) -->
+    <div class="about-head" data-reveal>
+      <div class="sec-label">
+        <span class="bar"></span>
+        <span class="txt">About LJ View</span>
+        <span class="bar"></span>
+      </div>
+      <h2>브랜드의 결을<br><span class="accent">설계</span>하다</h2>
+      <p>엘제이뷰는 기획·디자인·전략의 흐름 속에서<br>당신의 브랜드 이야기를 가장 효과적으로 전달합니다.</p>
+    </div>
+
+    <div class="about-grid">
+      <div data-reveal>
+        <div class="founder-photo-frame">
+          <span class="founder-photo-word" aria-hidden="true">MARKETER</span>
+          <img src="assets/founder.png" alt="이지원 대표">
+        </div>
+      </div>
+
+      <div data-reveal>
+        <div class="founder-head">
+          <span class="eyebrow">Founder</span>
+          <h3>이지원 <span class="suffix">대표</span></h3>
+          <p class="role">엘제이뷰 대표 · 10년차 현업 마케터</p>
+          <div class="founder-tags">
+            <span>#AI 마케팅 강의</span>
+            <span>#홍보대행</span>
+            <span>#디자인</span>
+            <span>#브랜딩 컨설팅</span>
+          </div>
+        </div>
+        <ul class="founder-list">
+          <li class="lead"><span class="bullet"></span>지금도 매일 현장에서 뛰는 현업 마케터입니다</li>
+          <li><span class="bullet"></span>현) 엘제이뷰 대표 · 마케팅 실무 경력 10년+</li>
+          <li><span class="bullet"></span>대학·기관·기업 AI 마케팅 강의 진행</li>
+          <li><span class="bullet"></span>네이버 블로그·인스타그램 운영대행 및 브랜딩 컨설팅</li>
+          <li><span class="bullet"></span>상세페이지·블로그 스킨 등 콘텐츠 기획·디자인 제작</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 스탯: 스크롤 진입 시 숫자 카운트업 -->
+    <div class="stats" data-reveal id="statsBox">
+      <div class="stat"><div class="num"><span class="count" data-count="10">0</span><span class="suffix">년+</span></div><p class="label">마케팅 실무 경력</p></div>
+      <div class="stat"><div class="num"><span class="count" data-count="300">0</span><span class="suffix">건+</span></div><p class="label">브랜드 콘텐츠 제작</p></div>
+      <div class="stat"><div class="num"><span class="count" data-count="20">0</span><span class="suffix">건+</span></div><p class="label">기관·기업 프로젝트</p></div>
+      <div class="stat"><div class="num"><span class="count" data-count="500">0</span><span class="suffix">명+</span></div><p class="label">강의 수강생</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 함께한 기관 마퀴 ============ -->
+<section class="clients">
+  <p class="clients-title">With LJ VIEW</p>
+  <div class="clients-track-wrap">
+    <div class="clients-track" id="clientsTrack">
+      <!-- JS가 목록을 2배로 복제해 무한 루프 -->
+    </div>
+    <div class="clients-fade-l"></div>
+    <div class="clients-fade-r"></div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="services-head" data-reveal>
+      <div class="sec-label on-dark">
+        <span class="bar"></span>
+        <span class="txt">Services</span>
+        <span class="bar"></span>
+      </div>
+      <h2>지금 현장에서 통하는<br>마케팅을 합니다</h2>
+      <p>강의부터 홍보대행, 디자인까지 —<br>10년차 현업 마케터가 직접 기획하고 실행합니다.</p>
+    </div>
+
+    <div class="services-grid">
+      <!-- 각 카드는 추후 상세 페이지로 연결 (새 창) : href만 교체 -->
+      <a href="#" target="_blank" rel="noopener" class="svc-card" data-reveal>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="7" width="25" height="18" rx="2"/><line x1="11.5" y1="30" x2="21.5" y2="30"/><line x1="16.5" y1="25" x2="16.5" y2="30"/>
+          <path d="M32.5 5.5l1.6 3.4 3.4 1.6-3.4 1.6-1.6 3.4-1.6-3.4-3.4-1.6 3.4-1.6z"/>
+        </svg>
+        <span class="en">ai marketing lecture</span>
+        <h3>AI 마케팅 강의</h3>
+        <p>대학·기관·기업 출강.<br>실습 위주, 결과물이 남는 강의.</p>
+        <span class="more">자세히 보기 <span>→</span></span>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="svc-card" data-reveal>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="20" cy="20" r="16"/><path d="M16.5 13.5l11 6.5-11 6.5z"/>
+        </svg>
+        <span class="en">online course</span>
+        <h3>온라인 강의</h3>
+        <p>10년차 현업 마케터의 노하우,<br>어디서든 배우는 실무 마케팅.</p>
+        <span class="more">자세히 보기 <span>→</span></span>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="svc-card" data-reveal>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 16.5v7l6 2v-11z"/><path d="M12 14l16-6.5v25l-16-6.5"/><path d="M12.5 25.5l1.8 6.5h4l-1.6-6"/><path d="M27.5 15.2c1.9 1.6 1.9 6.8 0 8.4"/>
+        </svg>
+        <span class="en">pr agency</span>
+        <h3>홍보대행</h3>
+        <p>블로그·인스타 운영대행.<br>언제든 미팅 가능한 로컬 마케터.</p>
+        <span class="more">자세히 보기 <span>→</span></span>
+      </a>
+      <a href="#" target="_blank" rel="noopener" class="svc-card" data-reveal>
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6.5c-8.7 0-14.5 6.2-14.5 12.9 0 6 3.8 9.8 9.4 9.8h1.8c1.3 0 2-0.9 2-1.8 0-0.8-0.5-1.5-1.3-2.1-0.8-0.6-1-1.5-0.5-2.3 0.6-0.9 1.6-1 2.6-0.5 1.9 0.9 4.1 1.4 6.5 1 4.7-0.9 7.2-4.7 6.4-9.3-0.9-4.7-6.3-7.7-12.4-7.7z"/>
+          <circle cx="13.2" cy="16.2" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.8" cy="12.3" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="24.6" cy="14.2" r="1.5" fill="currentColor" stroke="none"/><circle cx="26.4" cy="19.8" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+        <span class="en">graphic design</span>
+        <h3>홍보 디자인</h3>
+        <p>상세페이지·블로그 스킨·카드뉴스,<br>시선을 사로잡는 디자인.</p>
+        <span class="more">자세히 보기 <span>→</span></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS (마소니 그리드) ============ -->
+<section class="reviews" id="reviews">
+  <div class="container-narrow">
+    <div class="reviews-head" data-reveal>
+      <div class="sec-label">
+        <span class="bar"></span>
+        <span class="txt">Reviews</span>
+        <span class="bar"></span>
+      </div>
+      <h2>직접 함께한 분들의 이야기</h2>
+      <p>강의·홍보대행·디자인까지, 엘제이뷰와 함께한 시간의 진짜 기록입니다.</p>
+    </div>
+
+    <div class="review-tabs" data-reveal id="reviewTabs">
+      <button class="review-tab active" data-cat="전체">전체</button>
+      <button class="review-tab" data-cat="강의">강의후기</button>
+      <button class="review-tab" data-cat="홍보대행">홍보대행후기</button>
+      <button class="review-tab" data-cat="디자인">디자인후기</button>
+    </div>
+
+    <!--
+      후기 카드 관리 방법:
+      · 텍스트 후기 = .review-card / 사진 후기 = .review-card.photo
+      · data-cat 값(강의/홍보대행/디자인)으로 탭 필터링
+      · 사진은 가로폭 자동 맞춤, 세로는 원본 비율 그대로 (마소니라 높이 달라도 OK)
+      ⚠️ 아래 후기는 전부 예시 텍스트입니다. 실제 후기로 교체해 주세요.
+    -->
+    <div class="review-masonry" data-reveal id="reviewMasonry">
+      <div class="review-card" data-cat="강의">
+        <span class="tag">강의</span>
+        <p>이론보다 실전 위주의 강의라 현장에 바로 적용할 수 있었습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO기관 담당자</span></div>
+      </div>
+      <div class="review-card photo" data-cat="강의">
+        <div class="review-photo-placeholder" style="aspect-ratio:4/3;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.2"/><path d="M8 6l1.4-2h5.2L16 6"/></svg>
+        </div>
+        <div class="photo-body">
+          <span class="tag">강의</span>
+          <p class="photo-caption">OO기관 AI 마케팅 강의 현장 (예시 캡션)</p>
+        </div>
+      </div>
+      <div class="review-card" data-cat="홍보대행">
+        <span class="tag">홍보대행</span>
+        <p>기획부터 콘텐츠 제작까지 믿고 맡길 수 있어 부담이 줄었습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO기업 마케팅팀</span></div>
+      </div>
+      <div class="review-card" data-cat="강의">
+        <span class="tag">강의</span>
+        <p>수강생 눈높이에 맞춘 설명 덕분에 어렵지 않게 따라갈 수 있었습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO센터 교육담당</span></div>
+      </div>
+      <div class="review-card photo" data-cat="디자인">
+        <div class="review-photo-placeholder" style="aspect-ratio:1/1;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.2"/><path d="M8 6l1.4-2h5.2L16 6"/></svg>
+        </div>
+        <div class="photo-body">
+          <span class="tag">디자인</span>
+          <p class="photo-caption">OO브랜드 상세페이지 디자인 (예시 캡션)</p>
+        </div>
+      </div>
+      <div class="review-card" data-cat="디자인">
+        <span class="tag">디자인</span>
+        <p>상세페이지 디자인 이후 문의 전환이 눈에 띄게 늘었습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO쇼핑몰 대표</span></div>
+      </div>
+      <div class="review-card" data-cat="홍보대행">
+        <span class="tag">홍보대행</span>
+        <p>브랜드의 톤을 정확히 이해하고 홍보 방향을 잡아주셨습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO브랜드 대표</span></div>
+      </div>
+      <div class="review-card photo" data-cat="강의">
+        <div class="review-photo-placeholder" style="aspect-ratio:3/4;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.2"/><path d="M8 6l1.4-2h5.2L16 6"/></svg>
+        </div>
+        <div class="photo-body">
+          <span class="tag">강의</span>
+          <p class="photo-caption">OO대학 특강 현장 (예시 캡션)</p>
+        </div>
+      </div>
+      <div class="review-card" data-cat="디자인">
+        <span class="tag">디자인</span>
+        <p>브랜드 톤에 꼭 맞는 세련된 디자인으로 완성해주셨습니다. (예시 후기 텍스트입니다)</p>
+        <div class="meta"><span class="avatar">O</span><span class="org">OO브랜드 담당자</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOG (워드프레스 최신 글 3개 자동 연동) ============ -->
+<section class="blog" id="blog">
+  <div class="container">
+    <div class="blog-head">
+      <div data-reveal>
+        <div class="sec-label">
+          <span class="bar"></span>
+          <span class="txt">Blog</span>
+        </div>
+        <h2>브랜드의 시선을<br>기록합니다</h2>
+      </div>
+      <a href="/blog" class="blog-all" data-reveal>전체 보기 <span>→</span></a>
+    </div>
+    <!-- JS가 /wp-json/wp/v2/posts 에서 최신 3개를 가져와 채웁니다. 실패 시 아래 예시 카드 유지 -->
+    <div class="blog-grid" id="blogGrid" data-reveal>
+      <a class="post-card" href="/blog">
+        <div class="post-thumb"></div>
+        <span class="post-cat">Branding</span>
+        <h3 class="post-title">브랜드의 결을 만드는 기획의 시작점</h3>
+      </a>
+      <a class="post-card" href="/blog">
+        <div class="post-thumb"></div>
+        <span class="post-cat">AI Marketing</span>
+        <h3 class="post-title">AI를 활용한 콘텐츠 제작 워크플로우</h3>
+      </a>
+      <a class="post-card" href="/blog">
+        <div class="post-thumb"></div>
+        <span class="post-cat">Design</span>
+        <h3 class="post-title">클릭을 부르는 상세페이지 디자인 원칙</h3>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="contact" id="contact">
+  <div class="contact-grid">
+    <div class="contact-copy" data-reveal>
+      <p class="eyebrow">Contact</p>
+      <h2>마케팅 고민,<br>이제 혼자 하지 마세요</h2>
+      <p>강의·홍보대행·디자인 — 무엇이든 편하게 물어보세요.<br>10년차 현업 마케터가 직접 답합니다. 가장 빠른 상담은 카카오톡이에요.</p>
+      <a class="kakao-big" href="https://open.kakao.com/o/sMNS6hQh" target="_blank" rel="noopener">카카오톡으로 바로 문의 <span>→</span></a>
+    </div>
+
+    <div class="contact-form-card" data-reveal>
+      <!--
+        ⚠️ 워드프레스 적용 시: 이 폼은 데모입니다 (제출 시 완료 화면만 표시, 실제 발송 없음).
+        Contact Form 7 등 폼 플러그인의 숏코드로 교체하거나, form action을 연결해 주세요.
+      -->
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <label><span>담당자 성함</span><input type="text" id="cfName" required placeholder="이름을 입력해 주세요"></label>
+          <label><span>연락처</span><input type="text" id="cfPhone" required placeholder="010-0000-0000"></label>
+        </div>
+        <label><span>문의 구분</span>
+          <select id="cfType" required>
+            <option value="">문의 유형을 선택해 주세요</option>
+            <option value="강의">강의</option>
+            <option value="홍보대행">홍보대행</option>
+            <option value="컨설팅">컨설팅</option>
+            <option value="디자인">디자인</option>
+          </select>
+        </label>
+        <label><span>문의 내용</span><textarea id="cfDetails" required rows="5" placeholder="문의하실 내용을 자유롭게 작성해 주세요"></textarea></label>
+        <button type="submit" id="cfSubmit">문의 보내기</button>
+        <p class="form-note" id="cfError" style="color:#c0392b; display:none;"></p>
+        <p class="form-note">제출하신 정보는 상담 목적으로만 이용됩니다.</p>
+      </form>
+      <div class="form-done" id="formDone" hidden>
+        <div class="check">✓</div>
+        <h3>문의가 접수되었습니다</h3>
+        <p>빠른 시일 내에 답변드리겠습니다. 감사합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="assets/lj-view-logo-light.png" alt="LJ VIEW">
+        <p>시선을 디자인하다.<br>기획과 디자인, 전략이 만나는 브랜드 마케팅 하우스.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <p class="col-title">Menu</p>
+          <ul>
+            <li><a href="#top">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="col-title">Contact</p>
+          <a class="footer-kakao" href="https://open.kakao.com/o/sMNS6hQh" target="_blank" rel="noopener">카카오톡 문의 →</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 LJ VIEW. All rights reserved.</p>
+      <p class="gm" style="letter-spacing:0.04em;">LJ VIEW · 엘제이뷰</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---------- 엘제이뷰 강의 프로그램 Netlify 사이트의 노션 연동 함수 ----------
+     배포 후 이 사이트의 실제 주소로 교체하세요 (Netlify 대시보드 > Site settings > Domain management).
+     크레딧 복구 전까지는 로컬 테스트만 가능합니다. */
+  var API_BASE = 'https://YOUR-NETLIFY-SITE.netlify.app';
+
+  /* ---------- 헤더: 스크롤 시 배경만 변경 (히어로가 밝아져서 로고는 항상 컬러 버전 고정) ---------- */
+  var header = document.getElementById('siteHeader');
+  function onScroll() {
+    var scrolled = (window.scrollY || 0) > 40;
+    header.classList.toggle('scrolled', scrolled);
+    checkReveal();
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+
+  /* ---------- 스크롤 등장 애니메이션 ---------- */
+  function checkReveal() {
+    var vh = window.innerHeight || 800;
+    document.querySelectorAll('[data-reveal]:not(.shown)').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) el.classList.add('shown');
+    });
+  }
+  // 안전장치: 8초 뒤 전부 표시
+  setTimeout(function () {
+    document.querySelectorAll('[data-reveal]').forEach(function (el) { el.classList.add('shown'); });
+  }, 8000);
+
+  /* ---------- 스탯 카운트업 ---------- */
+  var counted = false;
+  function countUp() {
+    if (counted) return;
+    var box = document.getElementById('statsBox');
+    if (!box) return;
+    var r = box.getBoundingClientRect();
+    if (r.top > (window.innerHeight || 800) * 0.92) return;
+    counted = true;
+    box.querySelectorAll('.count').forEach(function (el) {
+      var target = Number(el.dataset.count) || 0;
+      var start = null;
+      function step(ts) {
+        if (!start) start = ts;
+        var p = Math.min((ts - start) / 1400, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  window.addEventListener('scroll', countUp, { passive: true });
+
+  /* ---------- 함께한 기관 마퀴 (노션 "위드 엘제이뷰 로고" DB 연동) ----------
+     로고 파일이 등록된 항목은 이미지로, 없는 항목은 텍스트로 렌더링. 연동 실패 시 아래 목록으로 대체. */
+  var FALLBACK_CLIENT_NAMES = ['진주폴리텍대학', '창신대학교', '진해여성인력개발센터', '창원시', '경남경영자총협회', '인천로열투어', '드윌레저캠프', '효제브라이덜', '엘렌브라이덜', '경남행복내일센터', '진주 평생학습관', '김해시 사회적경제지원센터', '김해청년센터'];
+
+  function renderClientsTrack(partners) {
+    var track = document.getElementById('clientsTrack');
+    if (!track) return;
+    var html = partners.map(function (p) {
+      return p.logo
+        ? '<img src="' + p.logo + '" alt="' + p.name + '" style="height:28px; width:auto; display:block;">'
+        : '<span>' + p.name + '</span>';
+    }).join('');
+    track.innerHTML = html + html; // 2배 복제 → 무한 루프
+  }
+
+  fetch(API_BASE + '/.netlify/functions/site-partners')
+    .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
+    .then(function (data) {
+      if (!data.partners || !data.partners.length) throw new Error('empty');
+      renderClientsTrack(data.partners);
+    })
+    .catch(function () {
+      renderClientsTrack(FALLBACK_CLIENT_NAMES.map(function (n) { return { name: n, logo: null }; }));
+    });
+
+  /* ---------- 후기 (노션 "홈페이지 후기" DB 연동) ----------
+     노출 체크된 실제 후기가 하나라도 있으면 그걸로 교체하고, 없거나 연동 실패 시 예시 카드를 그대로 둠. */
+  function reviewCardHtml(r) {
+    if (r.photo) {
+      return '<div class="review-card photo" data-cat="' + r.category + '">' +
+        '<img src="' + r.photo + '" alt="">' +
+        '<div class="photo-body"><span class="tag">' + r.category + '</span><p class="photo-caption">' + (r.text || r.org || '') + '</p></div>' +
+        '</div>';
+    }
+    var initial = (r.org || '').trim().charAt(0) || '★';
+    return '<div class="review-card" data-cat="' + r.category + '">' +
+      '<span class="tag">' + r.category + '</span>' +
+      '<p>' + r.text + '</p>' +
+      '<div class="meta"><span class="avatar">' + initial + '</span><span class="org">' + (r.org || '') + '</span></div>' +
+      '</div>';
+  }
+
+  fetch(API_BASE + '/.netlify/functions/site-reviews')
+    .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
+    .then(function (data) {
+      if (!data.reviews || !data.reviews.length) return; // 아직 등록된 후기 없음 -> 예시 카드 유지
+      var masonry = document.getElementById('reviewMasonry');
+      masonry.innerHTML = data.reviews.map(reviewCardHtml).join('');
+    })
+    .catch(function () { /* 연동 실패 시 예시 카드 유지 */ });
+
+  /* ---------- 후기 탭 필터 ---------- */
+  var tabs = document.getElementById('reviewTabs');
+  if (tabs) {
+    tabs.addEventListener('click', function (e) {
+      var btn = e.target.closest('.review-tab');
+      if (!btn) return;
+      tabs.querySelectorAll('.review-tab').forEach(function (b) { b.classList.toggle('active', b === btn); });
+      var cat = btn.dataset.cat;
+      document.querySelectorAll('#reviewMasonry .review-card').forEach(function (card) {
+        card.hidden = (cat !== '전체' && card.dataset.cat !== cat);
+      });
+    });
+  }
+
+  /* ---------- 블로그: 워드프레스 최신 글 3개 ----------
+     같은 워드프레스 도메인에 올리면 자동 작동합니다.
+     (외부 도메인 테스트 시엔 WP_BASE에 워드프레스 주소를 넣으세요) */
+  var WP_BASE = ''; // 예: 'https://ljview.com'
+  fetch(WP_BASE + '/wp-json/wp/v2/posts?per_page=3&_embed=1')
+    .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
+    .then(function (posts) {
+      if (!posts || !posts.length) return;
+      var grid = document.getElementById('blogGrid');
+      grid.innerHTML = posts.map(function (p) {
+        var thumb = '';
+        try { thumb = p._embedded['wp:featuredmedia'][0].source_url || ''; } catch (e) {}
+        var cat = '';
+        try { cat = p._embedded['wp:term'][0][0].name || ''; } catch (e) {}
+        return '<a class="post-card" href="' + p.link + '">' +
+          '<div class="post-thumb">' + (thumb ? '<img src="' + thumb + '" alt="" loading="lazy">' : '') + '</div>' +
+          (cat ? '<span class="post-cat">' + cat + '</span>' : '') +
+          '<h3 class="post-title">' + p.title.rendered + '</h3></a>';
+      }).join('');
+      grid.classList.add('shown');
+    })
+    .catch(function () { /* 연동 전/실패 시 예시 카드 유지 */ });
+
+  /* ---------- 문의 폼 -> 노션 "고객 요청 관리" DB로 저장 ---------- */
+  var form = document.getElementById('contactForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var errorEl = document.getElementById('cfError');
+      var submitBtn = document.getElementById('cfSubmit');
+      errorEl.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = '보내는 중...';
+
+      fetch(API_BASE + '/.netlify/functions/site-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('cfName').value,
+          phone: document.getElementById('cfPhone').value,
+          requestType: document.getElementById('cfType').value,
+          details: document.getElementById('cfDetails').value,
+        }),
+      })
+        .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
+        .then(function () {
+          form.hidden = true;
+          document.getElementById('formDone').hidden = false;
+        })
+        .catch(function () {
+          errorEl.textContent = '문의 접수에 실패했습니다. 잠시 후 다시 시도하거나 카카오톡으로 문의해 주세요.';
+          errorEl.style.display = 'block';
+        })
+        .finally(function () {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '문의 보내기';
+        });
+    });
+  }
+
+  onScroll();
+  checkReveal();
+})();
+</script>
+</body>
+</html>
