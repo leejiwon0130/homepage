@@ -89,7 +89,7 @@
   .hero-scroll .label { font-size:12px; letter-spacing:0.18em; text-transform:uppercase; }
 
   /* ============ ABOUT ============ */
-  .about { background:var(--cream); padding:clamp(86px,10vw,150px) 0; position:relative; overflow:hidden; }
+  .about { background:#fff; padding:clamp(86px,10vw,150px) 0; position:relative; overflow:hidden; }
   .about-watermark { position:absolute; top:64px; right:-1.5%; font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(120px,17vw,250px); line-height:0.8; color:rgba(26,58,53,0.05); letter-spacing:-0.04em; pointer-events:none; user-select:none; z-index:0; }
   .about-inner { position:relative; z-index:1; }
   /* 좌우 균형: 섹션 헤더를 중앙 정렬로 (기존 왼쪽 치우침 수정) */
@@ -119,11 +119,11 @@
   .founder-list .bullet { flex:none; width:7px; height:7px; border-radius:50%; background:rgba(67,164,157,0.45); margin-top:9px; }
   .founder-list li.lead .bullet { background:var(--brand); }
 
-  .stats { margin-top:clamp(60px,7vw,92px); background:var(--brand-deep); border-radius:24px; padding:clamp(40px,4.6vw,60px) clamp(26px,4vw,56px); display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(26px,4vw,40px); }
+  .stats { margin-top:0; background:var(--brand); border-radius:24px; padding:clamp(40px,4.6vw,60px) clamp(26px,4vw,56px); display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(26px,4vw,40px); }
   .stat { text-align:center; }
   .stat .num { font-family:'Gmarket Sans',sans-serif; font-weight:700; font-size:clamp(38px,4.4vw,56px); line-height:1; color:#fff; letter-spacing:-0.02em; }
-  .stat .num .suffix { font-size:0.42em; font-weight:700; margin-left:3px; color:var(--brand); }
-  .stat .label { margin:15px 0 0; font-size:clamp(13px,1.1vw,15px); font-weight:600; color:#8fd3cb; }
+  .stat .num .suffix { font-size:0.42em; font-weight:700; margin-left:3px; color:var(--brand-deep); }
+  .stat .label { margin:15px 0 0; font-size:clamp(13px,1.1vw,15px); font-weight:600; color:rgba(255,255,255,0.85); }
 
   /* ============ CLIENTS 마퀴 (함께한 기관) ============ */
   .clients { background:var(--cream); padding:0 0 clamp(70px,8vw,110px); overflow:hidden; }
